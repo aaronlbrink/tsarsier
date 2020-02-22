@@ -64,7 +64,7 @@ const Home = (props) => {
         <input name="name" type="text" />
         <input type="submit" />
       </form>
-      <Link to="/courses?sort=name" />
+      <Link to="/players" />
 
       <p>Location:</p>
       <Stage width="300" height={300} options={{ backgroundColor: 0x1d2230 }}>
