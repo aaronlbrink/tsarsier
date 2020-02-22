@@ -122,57 +122,94 @@ module.exports = class GameServer {
         if (this.isActionRound) {
             let userToUpdate = this.users.find(user => user.username === username);
             if (userToUpdate) {
-                userToUpdate.input = {};
+                if (!userToUpdate.hasOwnProperty('input')) {
+                    userToUpdate.input = {};
+                }
                 userToUpdate.input.rotation = rotation;
             }
             console.log('Rotation input was accepted for' + username + " at an angle of " + rotation);
         }
+        console.log(this.users);
     }
 
-    setUserMagnitude(user, magnitude) {
-
+    setUserMagnitude(username, magnitude) {
+        if (this.isActionRound) {
+            let userToUpdate = this.users.find(user => user.username === username);
+            if (userToUpdate) {
+                if (!userToUpdate.hasOwnProperty('input')) {
+                userToUpdate.input = {};
+                }
+                userToUpdate.input.magnitude = magnitude;
+            }
+            console.log('Magnitude input was accepted for' + username + " at a magnitude of " + magnitude);
+        }
+        console.log(this.users);
     }
 
     // ROUND CALCULATIONS & RUNNING
     runRound() {
         this.io.emit('action round status', { actionRoundOn: false});
+        console.log('users!-----1')
+        console.log(this.users)
+        this.io.emit('action round results', { users: this.users });
         // Get calculations
     }
 
     
     generateTerrain() {
-        // Make the terrain
-        // Calculate the terrain 
-        let terrain = config.game.terrain;
-        let generation = terrain.generation;
-        let indexGenerating = 0;
-        this.heights = [generation.startHeight];
-        // While we haven't gotten to the end of the terrain
-        while (indexGenerating < terrain.width) {
-            let startHeight = this.heights[indexGenerating];
-            let generateDistance = util.randomIntBetween(generation.minCalculateDistance, generation.maxCalculateDistance);
-            let heightDistanceChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
-            for (let i = 0; i < generateDistance; i++) {
-                // Stop at end of terrain
-                if (indexGenerating === terrain.max) break;
-                let heightChange = (i / generateDistance) * heightDistanceChange;
-                var height = util.between(generation.minHeight, generation.maxHeight, Math.floor(startHeight - heightChange));
-                this.heights.push(height);
+        // The map is `terrain.width` pixels wide and theoretically infinitely tall.
+        // The map is divided into a grid of square cells that are `terrain.blockSize` pixels wide and tall.
+        // Each cell is either ground or air.
+
+        const {width, blockSize, minHeight, maxHeight} = config.game.terrain;
+        const {maxHeightChange} = config.game.terrain.generation;
+
+        let ground_cells = [];
+        let current_height = config.game.terrain.generation.startHeight;
+        for (let x = 0; x + blockSize <= width; x += blockSize) {
+            // adjust current_height a bit
+            // generate ground cells from the floor up to here and push into `ground_cells`.
+            const delta_height = util.randomFloatBetween(-maxHeightChange, maxHeightChange);
+            current_height = util.clamp(current_height + delta_height, minHeight, maxHeight);
+
+            for (let y = 0; y + blockSize/2 < current_height; y += blockSize) {
+                ground_cells.push({x:x, y:y});
             }
-            this.heights.push(terrain.minHeight);
         }
-        // Use the heights to generate the terrain as a bunch of boxes
-        var heightIndex = 0;
-        this.heights.forEach(h => {
-            this.terrainBoxes.push([]);
-            for(let i = 0; i < h; i++) {
-                let height = i * terrain.blockSize;
-                let width = heightIndex * terrain.blockSize;
-                let terrainBlockBody = Bodies.rectangle(width, height, width, height, {isStatic: true});
-                this.terrainBoxes[heightIndex].push(terrainBlockBody);
-            }
-            heightIndex++;
-        });
+        return ground_cells;
+        // TODO: use this approach that makes straighter lines:
+        // let terrain = config.game.terrain;
+        // let generation = terrain.generation;
+        // let indexGenerating = 0;
+        // this.heights = [generation.startHeight];
+        // // While we haven't gotten to the end of the terrain
+        // while (indexGenerating < terrain.width) {
+        //     let startHeight = this.heights[indexGenerating];
+        //     let generateDistance = util.randomIntBetween(generation.minCalculateDistance, generation.maxCalculateDistance);
+        //     let heightDistanceChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
+        //     for (let i = 0; i < generateDistance; i++) {
+        //         // Stop at end of terrain
+        //         if (indexGenerating === terrain.max) break;
+        //         indexGenerating++;
+        //         let heightChange = (i / generateDistance) * heightDistanceChange;
+        //         var height = util.clamp(generation.minHeight, generation.maxHeight, Math.floor(startHeight - heightChange));
+        //         this.heights.push(height);
+        //     }
+        //     this.heights.push(terrain.minHeight);
+        // }
+        // // Use the heights to generate the terrain as a bunch of boxes
+        // var heightIndex = 0;
+        // this.terrainBoxes = [];
+        // this.heights.forEach(h => {
+        //     this.terrainBoxes.push([]);
+        //     for(let i = 0; i < h; i++) {
+        //         let height = i * terrain.blockSize;
+        //         let width = heightIndex * terrain.blockSize;
+        //         let terrainBlockBody = Bodies.rectangle(width, height, width, height, {isStatic: true});
+        //         this.terrainBoxes[heightIndex].push(terrainBlockBody);
+        //     }
+        //     heightIndex++;
+        // });
     }
 
     generatePlayers() {

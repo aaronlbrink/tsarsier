@@ -3,7 +3,7 @@
         "networkUpdate": 15
     },
     "game": {
-        "roundDurationSeconds": 15,
+        "roundDurationSeconds": 6,
         "updatesPerSecond": 10,
         "teams": {
             "numberOfTeams": 2,
