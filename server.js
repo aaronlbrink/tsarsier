@@ -1,5 +1,3 @@
-// import socket from 'socket.io';
-
 var app = require('express')();
 var http = require('http').createServer(app);
 
