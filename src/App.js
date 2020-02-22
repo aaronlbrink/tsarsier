@@ -29,7 +29,7 @@ const App = () => {
       <Router history={customHistory}>
         <Switch>
           <Route path="/player/:user">
-            <Player socket={socket} history={customHistory} />
+            <Player socket={socket} />
           </Route>
           <Route exact path="/">
             <HomePage />

@@ -20,15 +20,18 @@ const PlayerComponent = ({socket, match, location, history}) => {
   const [angle, setAngle] = useState(0);
   const [power, setPower] = useState(0);
 
-  // useEffect(() => {
-  //   socket.emit('submit move', angle, username);
-  // }, [angle, socket])
-
-  // useEffect(() => {
-  //   socket.emit('submit move', angle);
-  // }, [power, socket])
+  useEffect(() => {
+    // Send power adjustment (on each input update)
+    socket.emit('power move', power, name);
+  }, [power, name, socket])
 
   useEffect(() => {
+    // Send angle adjustment (on each input update)
+    socket.emit('angle move', angle, name);
+  }, [angle, name, socket])
+
+  useEffect(() => {
+    // Get and set user's name from url params
     setName(match.params.user)
   }, [match.params.user]);
 
