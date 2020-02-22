@@ -63,7 +63,7 @@ const Home = (props) => {
     props.history.push('/player');
 
     // Send the user's name to the server
-    SocketIO.
+
     
   }
 
