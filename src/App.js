@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import Player from "./Player";
+import * as PIXI from 'pixi.js'
 import { Container, Stage, Sprite, Text } from "@inlet/react-pixi";
 import {
   BrowserRouter as Router,
@@ -51,27 +52,56 @@ const Home = props => {
 
     // temporary data for development
     const users = [{
-      name: 'A',
+      name: 'PETER',
       x: -170, y: -90,
       projectile: {
         x: -140, y:-120,
       },
     },{
-      name: 'B',
-      x: -10, y:10,
+      name: 'KRIS',
+      x: 0, y:0,
       projectile: {
-        x: -10, y:-30,
+        x: -10, y:-80,
       },
     },{
-      name: 'C',
+      name: 'ARCHIE',
       x:30, y: 35,
     }];
-    
+
+    const terrain_views = [];
+
     const user_views = users.map(user => {
-      return (<Sprite
+      return (
+      <Sprite
         image="https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png"
         x={user.x}
         y={user.y}
+        anchor={[0.5, 0.5]}
+      />);
+    });
+
+    const username_views = users.map(user => {
+      return (<Text
+        text={user.name}
+        x={user.x+5}
+        y={user.y+30}
+        anchor={0.5}
+        style={
+          new PIXI.TextStyle({
+            align: 'center',
+            fontFamily: '"Source Sans Pro", Helvetica, sans-serif',
+            fontSize: 15,
+            fontWeight: 400,
+            fill: ['#ffffff', '#00ff99'], // gradient
+            stroke: '#01d27e',
+            strokeThickness: 5,
+            dropShadow: true,
+            dropShadowColor: '#ccced2',
+            dropShadowBlur: 4,
+            dropShadowAngle: Math.PI / 6,
+            dropShadowDistance: 6,
+          })
+        }
       />);
     });
 
@@ -85,9 +115,7 @@ const Home = props => {
         />);
       });
 
-    const terrain_views = [];
-
-    return [...user_views, ...projectile_views, ...terrain_views];
+    return [...terrain_views, ...username_views, ...user_views, ...projectile_views];
   };
 
   useEffect(() => {
