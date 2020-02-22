@@ -12,6 +12,7 @@ var last_user_id = 0;
 io.on('connection', (socket) => {
   var addedUser = false;
 
+  // Connecting users
   socket.on('add user', (username) => {
     if (addedUser) return; // idempotent
     addedUser = true;
@@ -26,7 +27,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('submit move', (move) => {
+  socket.on('submit move', (move, username) => {
     console.log(`user chose to move ${JSON.stringify(move)}`);
   })
 
@@ -35,6 +36,12 @@ io.on('connection', (socket) => {
     if (idx >= 0) users.splice(idx, 1);
     console.log(`removed user ${socket.username} with id ${socket.user_id} (users are ${JSON.stringify(users)})`);
   });
+
+  // TODO:
+  // Game Round Signals
+  // Indicate to clients with connected sockets which turn it is so controllers can make inputs avaliable
+  // Rounds:
+  //   - 
 });
 
 http.listen(process.env.SERVER_PORT, function(){
