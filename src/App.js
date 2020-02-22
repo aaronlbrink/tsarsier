@@ -1,8 +1,8 @@
-import React, { useReducer, useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import Player from "./Player";
-import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
+import { Container, Stage, Sprite, Text } from "@inlet/react-pixi";
 import {
   BrowserRouter as Router,
   Switch,
@@ -47,31 +47,47 @@ const Home = props => {
   const [name, setName] = useState();
   const [tickNumber, setTickNumber] = useState();
 
-  const reducer = (_, { data }) => data;
-  const Bunny = () => {
-    const [motion, update] = useReducer(reducer);
-    const iter = useRef(0);
+  const Visuals = () => {
 
-    useTick(delta => {
-      const i = (iter.current += 0.05 * delta);
-
-      update({
-        type: "update",
-        data: {
-          x: Math.sin(i) * 100,
-          y: Math.sin(i / 1.5) * 100,
-          rotation: Math.sin(i) * Math.PI,
-          anchor: Math.sin(i / 2)
-        }
-      });
+    // temporary data for development
+    const users = [{
+      name: 'A',
+      x: -170, y: -90,
+      projectile: {
+        x: -140, y:-120,
+      },
+    },{
+      name: 'B',
+      x: -10, y:10,
+      projectile: {
+        x: -10, y:-30,
+      },
+    },{
+      name: 'C',
+      x:30, y: 35,
+    }];
+    
+    const user_views = users.map(user => {
+      return (<Sprite
+        image="https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png"
+        x={user.x}
+        y={user.y}
+      />);
     });
 
-    return (
-      <Sprite
-        image="https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png"
-        {...motion}
-      />
-    );
+    const projectile_views = users
+      .filter(user => user.projectile)
+      .map(user => {
+        return (<Text
+          text="•"
+          x={user.projectile.x}
+          y={user.projectile.y}
+        />);
+      });
+
+    const terrain_views = [];
+
+    return [...user_views, ...projectile_views, ...terrain_views];
   };
 
   useEffect(() => {
@@ -138,12 +154,13 @@ const Home = props => {
       <p>Don't press enter to connect, click the go link</p>
 
       <p>Namen: {name}</p>
+
       <p style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</p>
       <p onClick={startFirstRound}>Start First Round (everyone is in the game)</p>
       <p>TIMER: {tickNumber}</p>
-      <Stage width={300} height={300} options={{ backgroundColor: 0x1d2230 }}>
-        <Container x={150} y={150}>
-          <Bunny />
+      <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
+        <Container x={200} y={200}>
+          <Visuals />
         </Container>
       </Stage>
     </>
