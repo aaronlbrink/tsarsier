@@ -30,6 +30,7 @@ Data sent from phone:
 
 module.exports = class GameServer {
     constructor() {
+        this.engine = Engine.create();
     }
 
     getRoundCount() {
@@ -44,6 +45,7 @@ module.exports = class GameServer {
     
     resetValuesOnNewGame() {
         this.roundCount = 0;
+        this.terrainBoxes = [];
     }
 
     destroyPreviousGame() {
@@ -66,18 +68,40 @@ module.exports = class GameServer {
         // Calculate the terrain 
         let terrain = config.game.terrain;
         let generation = terrain.generation;
-        var indexGenerating = 0;
-        this.heights = [];
-        while (indexGenerating < terrain.width/2) {
+        let indexGenerating = 0;
+        this.heights = [generation.startHeight];
+        // While we haven't gotten to the end of the terrain
+        while (indexGenerating < terrain.width) {
+            let startHeight = this.heights[indexGenerating];
+            let generateDistance = util.randomIntBetween(generation.minCalculateDistance, generation.maxCalculateDistance);
+            let heightChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
+            for (let i = 0; i < generateDistance; i++) {
+                // stop before getting to end of terrain
+                if (indexGenerating == terrain.max) break;
+                let heightChange = (i / generateDistance) * heightChange;
+                var height = util.between(generation.minHeight, generation.maxHeight, Math.floor(startHeight - heightChange));
+                this.heights.push(height);
+            }
             heights.push(terrain.minHeight);
         }
-        // While we haven't gotten to the end of the terrain
-
+        // Use the heights to generate the terrain as a bunch of boxes
+        var heightIndex = 0;
+        this.heights.forEach(h => {
+            this.terrainBoxes.push([]);
+            for(let i = 0; i < h; i++) {
+                let height = i * terrain.blockSize;
+                let width = heightIndex * terrain.blockSize;
+                let terrainBlockBody = Bodies.rectangle(width, height, width, height, {isStatic: true});
+                this.terrainBoxes[heightIndex].push(terrainBlockBody);
+            }
+            heightIndex++;
+        });
     }
 
     generatePlayers() {
         this.randomlyAssignTeam();
         // Make all of the bodys for each player and spawn them randomly on their side of the game
+        
     }
 
     randomlyAssignTeam() {
@@ -97,6 +121,6 @@ module.exports = class GameServer {
 
     roundAnimate() {
         // 
-    }
 
+    }
 }
