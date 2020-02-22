@@ -2,10 +2,9 @@ require('dotenv').config()
 var app = require('express')();
 var http = require('http').createServer(app);
 // var io = require('socket.io')(http);
-var GameServer = require('GameServer');
+// var GameServer = require('./server/game-server');
 
-const Game = new GameServer(0);
-Game.start();
+// const Game = new GameServer();
 
 const io = require("socket.io")(http, {
   handlePreflightRequest: (req, res) => {
@@ -23,6 +22,10 @@ const io = require("socket.io")(http, {
 app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
+
+app.post('/reset', function(req, res) {
+  console.log(JSON.stringify(req.body));
+})
 
 var users = [];
 var last_user_id = 0;
