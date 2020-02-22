@@ -49,10 +49,7 @@ module.exports = class GameServer {
 
     startRoundCountdown = () => {
         this.isActionRound = true;
-        this.io.on("connection", socket => {
-            console.log('figure out backend')
-            socket.emit('action round status');
-        });
+        this.io.emit('action round status', { actionRoundOn: true});
         this.roundCountdowns();
     }
 
@@ -138,6 +135,7 @@ module.exports = class GameServer {
 
     // ROUND CALCULATIONS & RUNNING
     runRound() {
+        this.io.emit('action round status', { actionRoundOn: false});
         // Get calculations
     }
 
