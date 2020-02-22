@@ -91,7 +91,7 @@ const Home = props => {
   };
 
   const startGame = () => {
-    axios.post('/reset', {
+    axios.post('http://localhost:3001/reset', {
       start: true,
     })
     .then(function (response) {
