@@ -1,4 +1,4 @@
-import React, { useReducer, useRef } from "react";
+import React from "react";
 // import logo from './logo.svg';
 import "./App.css";
 // import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
