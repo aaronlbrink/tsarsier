@@ -50,11 +50,7 @@ io.on("connection", socket => {
   });
 
   socket.on("power move", (move, username) => {
-    // console.log(
-    //   `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
-    //     username
-    //   )}`
-    // );
+    Game.setUserMagnitude(username, move);
   });
 
   socket.on("disconnect", () => {

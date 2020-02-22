@@ -61,11 +61,12 @@ const PlayerComponent = ({socket, match, location, history}) => {
     <>
 
       <Link to="/">Toggle Web</Link>
+      {actionsDisabled ? <div style={{width: 20, height: 20, backgroundColor: 'red'}} /> : <div style={{width: 20, height: 20, backgroundColor: 'green', borderRadius: '100'}} /> }
       <p>You are: {name}!</p>
       <label htmlFor="angle">Angle (0-360)
         <input disabled={actionsDisabled} type="number" name="angle" min="0" max="360" onChange={(e) => setAngle(e.target.value)} value={angle} />
       </label>
-      <label  htmlFor="power">Power (0-{config.game.player.input.maxMagnitude})
+      <label htmlFor="power">Power (0-{config.game.player.input.maxMagnitude})
       <input disabled={actionsDisabled} type="number" name="power" min="0" max={config.game.player.input.maxMagnitude} onChange={(e) => setPower(e.target.value)} value={power} />
       </label>
     </>
