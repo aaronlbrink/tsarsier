@@ -3,8 +3,10 @@
         "networkUpdate": 15
     },
     "game": {
-        "roundDurationSeconds": 6,
+        "countDownMax": 10,
+        "roundDurationSeconds": 15,
         "updatesPerSecond": 10,
+        "maxUpdatePerRound": 64,
         "teams": {
             "numberOfTeams": 2,
             "team1Color": "blue",
@@ -16,11 +18,18 @@
             "nameMaxCharCount": 15,
             "body": {
                 "width": 10,
-                "height": 20
+                "height": 20,
+                "gunLength": 15
             },
+            "bulletRadius": 4,
             "input": {
                 "maxMovement": 10,
                 "maxMagnitude": 20
+            },
+            "movement": {
+                "movementSpeed": 2,
+                "giveUpMovementTime": 60,
+                "gunRotationSpeed": 5
             }
         },
         "terrain": {

@@ -83,6 +83,7 @@ module.exports = class GameServer {
         this.isActionRound = false;
         this.roundCount = 0;
         this.terrainBoxes = [];
+        this.bullets = [];
         this.roundCountdownToZero();
     }
 
@@ -105,6 +106,12 @@ module.exports = class GameServer {
         this.users.push({
             username: username,
             userId: ++this.userIds,
+            game: {
+                moved: false,
+                shot: false,
+                gunAngle: 90,
+                roundStartPosX: null
+            },
         });
         return this.userIds;
     }
@@ -233,6 +240,7 @@ module.exports = class GameServer {
                 throw new Error("Cannot handle more than two teams"); 
             })();
             // spawn way above the ground. Simulation will have to happen to get them to touch the ground.
+            // Todo. Make sure this doesn't not work
             u.box = Bodies.rectangle(spawnX, spawnY, body.width, body.height, {inertia: "Infinity"});
             World.add(this.world, u.box);
         });
@@ -257,24 +265,103 @@ module.exports = class GameServer {
     roundAnimate() {
         // pretend like I have a bunch of input
         // calculate the game from the fake input
-        let player = config.game.player;
+        let game = config.game;
+        let player = game.player;
         this.users.forEach(u => {
             u.input = {
                 rotation: util.randomFloatBetween(0, 360), 
                 magnitude: util.randomFloatBetween(0, player.input.maxMagnitude),
                 distance: util.randomFloatBetween(0, player.input.maxMovement),
             };
+            u.game.roundStartPosX = u.box.position.x;
         });
-        
+        let updates = 0;
         while(true) {
-            // Keep trying to move the player until the distance has been moved
-
-            // Rotate until get the rotation specified by player
+            if (updates > game.maxUpdatePerRound) {
+                break;
+            }
+            updates++;
             
-            // Then once rotation is done take time to get the magnitude
+            this.users.forEach(u => {
+                let input = u.input;
+                let movement = config.game.player.movement;
+                // check distance movement done
+                if (input.distance !== 0 && input.distance !== null) {
+                    // Keep trying to move the player until the distance has been moved
+                    let vel = movement.movementSpeed;
+                    let playerX = u.box.position.x;
+                    let goingToPlace = u.game.roundStartPosX + input.distance;
+                    let move = () => {
+                        u.box.applyForce(u.box, u.box.position, Matter.Vector(vel, 2));
+                    };
+                    if (input.distance > 0) {
+                        if (playerX < goingToPlace) {
+                            move();
+                        }
+                    } 
+                    if (input.distance < 0) {
+                        vel = -vel;
+                        if (playerX > goingToPlace) {
+                            move();
+                        }
+                    }
+                }
 
+                // check shoot input done
+                if (input.angle !== null && input.magnitude !== null && !u.shot) {
+                    // rotate until at the angle
+                    // if (u.gunAngle !== input.angle) {
+                    //     // Figure out if adding or subtracting would be faster for rotation
+                    //     // https://stackoverflow.com/a/27682018/2948122
+                    //     var gunRadeons = util.degreesToRadeons(u.gunAngle)
+                    //     let inputRadeons = util.degreesToRadeons(input.angle);
+                    //     // check if angle is close enough to snap
+                    //     var snapAngle = () => {
+                    //         if ()
+                    //     }
+                    //     if (Math.sin(gunRadeons - inputRadeons) > 0) {
+                    //         u.gunAngle += movement.gunAngleSpeed;
+                    //         u.gunAngle %= 360;
+                    //     } else {
+                    //         u.gunAngle -= movement.gunAngleSpeed;
+                    //         u.gunAngle %= 360;
+                    //     }
+                    // }
+
+                    // Instant shoot for now
+                    u.gunAngle = input.angle;
+                    let radius = player.bulletRadius;
+                    let gunLength = player.body.gunLength
+                    let position = u.box.position;
+                    let x = Math.cos(util.degreesToRadeons(u.gunAngle)) * gunLength;
+                    let y = Math.sin(util.degreesToRadeons(u.gunAngle)) * gunLength;
+                    let bullet = Bodies.circle(position.x + x, position.y + y, radius);
+                    // Generate bullet
+                    World.add(this.world, bullet);
+                    // Set the bullet velocity
+                    this.bullets.push(bullet);
+                    let xBull = Math.cos(util.degreesToRadeons(u.gunAngle)) * u.input.magnitude;
+                    let yBull = Math.cos(util.degreesToRadeons(u.gunAngle)) * u.input.magnitude;
+                    bullet.applyForce(bullet, bullet.position, Matter.Vector(xBull, yBull));
+                    u.shot = true;
+                }
+                // Count down bullet max timer
+                // If bullet collides with something divide timer by 2
+                // If bullet hits user auto explode
+
+                // Calculate next thingy
+                Engine.update(this.engine, 1000/ game.updatesPerSecond);
+            });
             // Once all player input has been done
 
         }
+        finishRoundAnimate();
+    }
+
+    finishRoundAnimate = () => {
+        // cleanse the input
+        this.users.forEach(u => {
+            u.input = {rotation: null, magnitude: null, distance: null};
+        });
     }
 }
