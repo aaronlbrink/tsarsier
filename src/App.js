@@ -47,6 +47,15 @@ const App = () => {
 const Home = props => {
   const [name, setName] = useState();
   const [tickNumber, setTickNumber] = useState();
+  const [actionRoundResults, setActionRoundResults] = useState();
+
+  useEffect(() => {
+    socket.on('action round results', (data) => {
+      console.log('Action round data' + data);
+      console.log(data)
+      setActionRoundResults(data.users);
+    })
+  })
 
   const Visuals = () => {
 
