@@ -42,13 +42,14 @@ const PlayerComponent = ({socket, match, location, history}) => {
       socket.emit('add user', name);
       socket.on('connect', () => {
         console.log('connection made!')
-      })
+      });
     }
   }, [name, socket])
   return (
     <>
 
       <Link to="/">Toggle Web</Link>
+      <p>You are: {name}!</p>
       <label htmlFor="angle">Angle
         <input type="text" name="angle" onChange={(e) => setAngle(e.target.value)} value={angle} />
       </label>

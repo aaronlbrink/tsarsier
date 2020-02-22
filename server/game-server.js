@@ -30,7 +30,10 @@ Data sent from phone:
 
 module.exports = class GameServer {
     constructor() {
+    }
 
+    getRoundCount() {
+        return this.roundCount;
     }
 
     checkEndGame() {
@@ -47,15 +50,23 @@ module.exports = class GameServer {
         
     }
 
-    gameStart() {
+    start() {
         // Has to run first
-        destroyPreviousGame();
+        this.destroyPreviousGame();
 
-        resetValuesOnNewGame();
+        this.resetValuesOnNewGame();
         this.generateTerrain();
         this.generatePlayers();
     }
 
+    resetValuesOnNewGame() {
+        // meh
+    }
+
+    resetValuesOnNewGame() {
+        // meh
+    }
+    
     generateTerrain() {
         // Make the terrain
         // Calculate the terrain 
@@ -81,7 +92,7 @@ module.exports = class GameServer {
         let teamNumber = 1;
         let usersToAssign = [...this.users];
         while (usersToAssign.length > 0) {
-            var index = utils.randomIntBetween(0, usersToAssign.length -1);
+            var index = util.randomIntBetween(0, usersToAssign.length -1);
             let userAssigning = usersToAssign[index];
             // TODO make this actually assign it to the team number
             
