@@ -183,8 +183,8 @@ const Home = props => {
 
       <p>Namen: {name}</p>
 
-      <p style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</p>
-      <p onClick={startFirstRound}>Start First Round (everyone is in the game)</p>
+      <button style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</button>
+      <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
       <p>TIMER: {tickNumber}</p>
       <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
         <Container x={200} y={200}>
