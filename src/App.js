@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, useState } from "react";
+import React, { useReducer, useRef, useState, useEffect } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import Player from "./Player";
@@ -45,6 +45,7 @@ const App = () => {
 // The Screen / TV View
 const Home = props => {
   const [name, setName] = useState();
+  const [tickNumber, setTickNumber] = useState();
 
   const reducer = (_, { data }) => data;
   const Bunny = () => {
@@ -73,6 +74,14 @@ const Home = props => {
     );
   };
 
+  useEffect(() => {
+    // Update round count
+    socket.on("tick tock", (update) => {
+      console.log('tick tock' + update);
+      setTickNumber(update)
+    })
+  }, )
+
   const goToClient = e => {
     if (name) {
       e.preventDefault();
@@ -90,8 +99,21 @@ const Home = props => {
     setName(thing.target.value);
   };
 
-  const startGame = () => {
+  const resetGame = () => {
     axios.post('http://localhost:3001/reset', {
+      reset: true,
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
+
+  const startFirstRound = () => {
+    axios.post('http://localhost:3001/start', {
       start: true,
     })
     .then(function (response) {
@@ -116,7 +138,9 @@ const Home = props => {
       <p>Don't press enter to connect, click the go link</p>
 
       <p>Namen: {name}</p>
-      <p style={{cursor: 'pointer'}} onClick={startGame}>Start Game</p>
+      <p style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</p>
+      <p onClick={startFirstRound}>Start First Round (everyone is in the game)</p>
+      <p>TIMER: {tickNumber}</p>
       <Stage width={300} height={300} options={{ backgroundColor: 0x1d2230 }}>
         <Container x={150} y={150}>
           <Bunny />

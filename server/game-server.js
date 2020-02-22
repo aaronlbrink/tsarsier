@@ -30,10 +30,33 @@ Data sent from phone:
 
 module.exports = class GameServer {
     constructor() {
+        this.roundCountdown = config.game.roundDurationSeconds;
     }
 
-    getRoundCount() {
-        return this.roundCount;
+    // GAME ROUND COUNTDOWN
+    roundCountdownToZero() {
+        console.log('Game timer zeroed out!');
+        this.timer = 0;
+
+    }
+
+    startRoundCountdown = () => {
+            setTimeout(() => {
+                console.log('ran' + this.roundCountdown)
+                if (this.roundCountdown > 0) {
+                    this.roundCountdown--;
+                    this.startRoundCountdown();
+                    return;
+                }
+                // Reset countdown
+                this.roundCountdown = config.game.roundDurationSeconds;
+                // Ask for playback to start
+                this.runRound();
+            }, 1000);
+    }
+
+    getTick() {
+        return this.roundCountdown;
     }
 
     checkEndGame() {
@@ -43,7 +66,9 @@ module.exports = class GameServer {
     }
     
     resetValuesOnNewGame() {
-        this.roundCount = 0;
+        // Reset every game variable for the new game
+        this.timer = 0;
+        this.roundCountdownToZero();
     }
 
     destroyPreviousGame() {
@@ -54,12 +79,17 @@ module.exports = class GameServer {
         // Resets the game, but acts as the game starter...
 
         // Has to run first
-        this.destroyPreviousGame();
-
         this.resetValuesOnNewGame();
-        this.generateTerrain();
-        this.generatePlayers();
+        // this.generateTerrain();
+        // this.generatePlayers();
+
     }
+
+    // ROUND CALCULATIONS & RUNNING
+    runRound() {
+        //meh
+    }
+
     
     generateTerrain() {
         // Make the terrain
