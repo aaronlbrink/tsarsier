@@ -34,6 +34,7 @@ module.exports = class GameServer {
         this.engine = Engine.create();
         this.users = [];
         this.userIds = 0;
+        this.world = this.engine.world;
     }
 
     // GAME ROUND COUNTDOWN
