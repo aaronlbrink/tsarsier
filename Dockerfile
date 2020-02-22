@@ -4,12 +4,11 @@ FROM node:9.11.2-jessie as builder
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY ./packages/frontend ./front
-RUN cd front/
+COPY ./ ./
 RUN npm config set unsafe-perm
-RUN npm install && npm run-script build
+RUN npm install && npm run build
 
-ADD deploy/serve.sh serve.sh
+# ADD deploy/serve.sh serve.sh
 
 EXPOSE 3000/tcp
 
