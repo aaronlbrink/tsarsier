@@ -167,7 +167,6 @@ module.exports = class GameServer {
         let ground_cells = [];
         let current_height = config.game.terrain.generation.startHeight;
         for (let x = 0; x + blockSize <= width; x += blockSize) {
-            console.log(x, ground_cells.length, current_height);
             // adjust current_height a bit
             // generate ground cells from the floor up to here and push into `ground_cells`.
             const delta_height = util.randomFloatBetween(-maxHeightChange, maxHeightChange);
