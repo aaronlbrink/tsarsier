@@ -27,8 +27,12 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('submit move', (move, username) => {
-    console.log(`user chose to move ${JSON.stringify(move)}`);
+  socket.on('angle move', (move, name) => {
+    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(name)}`);
+  })
+
+  socket.on('power move', (move, name) => {
+    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(name)}`);
   })
 
   socket.on('disconnect', () => {
