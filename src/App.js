@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import Player from "./Player";
 import * as PIXI from 'pixi.js'
-import { Container, Stage, Sprite, Text } from "@inlet/react-pixi";
+import { Container, Stage, Sprite, Text, Graphics } from "@inlet/react-pixi";
 import {
   BrowserRouter as Router,
   Switch,
@@ -59,41 +59,71 @@ const Home = props => {
 
   const Visuals = () => {
 
-    // temporary data for development
+    // These fake users are just for development
     const users = [{
       name: 'PETER',
-      x: -170, y: -90,
+      x: 340, y: 100,
       projectile: {
-        x: -140, y:-120,
+        x: 310, y:140,
       },
     },{
       name: 'KRIS',
-      x: 0, y:0,
+      x: 200, y:70,
       projectile: {
-        x: -10, y:-80,
+        x: 160, y:100,
       },
     },{
       name: 'ARCHIE',
-      x:30, y: 35,
+      x:50, y: 90,
     }];
+    // This fake terrain is just for development
+    const cell_x_coordinates = [...Array(200).keys()].map(i => i*2);
+    const terrain_ground_cells = cell_x_coordinates.flatMap(x =>
+        [...Array(20+Math.floor(Math.random()*20)).keys()].map(i => i*2).map(y => 
+          ({x:x, y:y})));
 
-    const terrain_views = [];
+    function transform_coordinate(server_x, server_y) {
+      // The server thinks (0,0) is the bottom-left and (400,400) is the top-right.
+      // PIXI.js thinks (0,0) is the top-left and (400,400) is the bottom-right.
+      // Later we'll dynamically change the width of the <canvas> requiring more code here.
+      return [server_x, 400-server_y];
+    }
+
+    const blockSize = 2; // todo: fetch from config.game.terrain.blockSize;
+    const terrain_views = terrain_ground_cells.map(cell => {
+      const [x, y] = transform_coordinate(cell.x, cell.y);
+      return (
+      <Graphics
+        draw={g => {
+          g.clear()
+          g.beginFill(0x9b7653)
+          g.moveTo(x, y)
+          g.lineTo(x + blockSize, y)
+          g.lineTo(x + blockSize, y + blockSize)
+          g.lineTo(x, y + blockSize)
+          g.endFill()
+        }}
+      />
+      );
+    });
 
     const user_views = users.map(user => {
+      const [x, y] = transform_coordinate(user.x, user.y);
       return (
       <Sprite
         image="https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png"
-        x={user.x}
-        y={user.y}
+        x={x}
+        y={y}
         anchor={[0.5, 0.5]}
       />);
     });
 
     const username_views = users.map(user => {
+      const [x, y] = transform_coordinate(user.x, user.y);
       return (<Text
         text={user.name}
-        x={user.x+5}
-        y={user.y+30}
+        x={x+5}
+        y={y+30}
         anchor={0.5}
         style={
           new PIXI.TextStyle({
@@ -117,10 +147,11 @@ const Home = props => {
     const projectile_views = users
       .filter(user => user.projectile)
       .map(user => {
+        const [x, y] = transform_coordinate(user.projectile.x, user.projectile.y);
         return (<Text
           text="•"
-          x={user.projectile.x}
-          y={user.projectile.y}
+          x={x}
+          y={y}
         />);
       });
 
@@ -196,7 +227,7 @@ const Home = props => {
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
       <p>TIMER: {tickNumber}</p>
       <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
-        <Container x={200} y={200}>
+        <Container x={0} y={0}>
           <Visuals />
         </Container>
       </Stage>
