@@ -122,28 +122,36 @@ module.exports = class GameServer {
         if (this.isActionRound) {
             let userToUpdate = this.users.find(user => user.username === username);
             if (userToUpdate) {
-                userToUpdate.input = {};
+                if (!userToUpdate.hasOwnProperty('input')) {
+                    userToUpdate.input = {};
+                }
                 userToUpdate.input.rotation = rotation;
             }
             console.log('Rotation input was accepted for' + username + " at an angle of " + rotation);
         }
+        console.log(this.users);
     }
 
     setUserMagnitude(username, magnitude) {
         if (this.isActionRound) {
             let userToUpdate = this.users.find(user => user.username === username);
             if (userToUpdate) {
+                if (!userToUpdate.hasOwnProperty('input')) {
                 userToUpdate.input = {};
+                }
                 userToUpdate.input.magnitude = magnitude;
             }
             console.log('Magnitude input was accepted for' + username + " at a magnitude of " + magnitude);
         }
+        console.log(this.users);
     }
 
     // ROUND CALCULATIONS & RUNNING
     runRound() {
         this.io.emit('action round status', { actionRoundOn: false});
-
+        console.log('users!-----1')
+        console.log(this.users)
+        this.io.emit('action round results', { users: this.users });
         // Get calculations
     }
 
