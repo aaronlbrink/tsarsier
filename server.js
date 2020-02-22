@@ -37,6 +37,6 @@ io.on('connection', (socket) => {
   });
 });
 
-http.listen(3001, function(){
+http.listen(process.env.SERVER_PORT, function(){
   console.log('listening on *:3001');
 });

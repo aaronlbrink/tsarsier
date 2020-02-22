@@ -5,6 +5,9 @@ import Player from "./Player";
 import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
 import { BrowserRouter as Router, Switch, Route, Redirect, Link, withRouter, } from "react-router-dom";
 import { createBrowserHistory } from "history";
+import io from 'socket.io-client';
+
+const socket = io.connect('http://localhost:3001');
 
 // Quick Routing
 const App = () => {
@@ -60,11 +63,10 @@ const Home = (props) => {
   const goToClient = e => {
     e.preventDefault();
     console.log(e);
-    props.history.push('/player');
-
     // Send the user's name to the server
+    socket.emit('add user', name);
 
-    
+    props.history.push('/player');
   }
 
   const handleUpdateName = thing => {
