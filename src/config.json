@@ -1,0 +1,23 @@
+{
+    "api": {
+        "networkUpdate": 15
+    },
+    "game": {
+        "updatesPerSecond": 10,
+        "player": {
+            "nameMaxCharCount": 15,
+            "body": {
+                "width": 10,
+                "height": 20
+            },
+            "input": {
+                "maxMovement": 10,
+                "maxMagnitude": 20
+            }
+        },
+        "terrain": {
+            "width": 400,
+            "height": 200
+        }
+    }
+}
