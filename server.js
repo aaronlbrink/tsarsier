@@ -5,7 +5,6 @@ var cors = require("cors");
 // var io = require('socket.io')(http);
 var GameServer = require("./server/game-server");
 
-const Game = new GameServer();
 app.use(cors());
 const io = require("socket.io")(http, {
   handlePreflightRequest: (req, res) => {
@@ -19,23 +18,10 @@ const io = require("socket.io")(http, {
   }
 });
 
-// io.set('origins', 'http://localhost:3001');
-app.get("/", function(req, res) {
-  res.send("<h1>Hello world</h1>");
-});
-
-// Game start
-app.post("/reset", function(req, res) {
-  Game.resetStart();
-});
-
-app.post("/start", function(req, res) {
-  Game.startRoundCountdown();
-});
+const Game = new GameServer(io);
 
 io.on("connection", socket => {
   var addedUser = false;
-
   // Connecting users
   socket.on("add user", username => {
     if (addedUser) return; // idempotent
@@ -55,20 +41,20 @@ io.on("connection", socket => {
   });
 
   socket.on("angle move", (move, username) => {
-    console.log(
-      `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
-        username
-      )}`
-    );
-    Game.setUserAngle(username, move);
+      // console.log(
+      // `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
+      //   username
+      // )}`
+      //);
+    Game.setUserRotation(username, move);
   });
 
   socket.on("power move", (move, username) => {
-    console.log(
-      `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
-        username
-      )}`
-    );
+    // console.log(
+    //   `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
+    //     username
+    //   )}`
+    // );
   });
 
   socket.on("disconnect", () => {
@@ -80,7 +66,22 @@ io.on("connection", socket => {
   });
 
 
+});
 
+
+// RESTFUL Endpoints
+app.get("/", function(req, res) {
+  res.send("<h1>Hello world</h1>");
+});
+
+// Game start
+app.post("/reset", function(req, res) {
+  Game.resetStart();
+});
+
+app.post("/start", function(req, res) {
+  Game.startRoundCountdown();
+  
 });
 
 http.listen(process.env.SERVER_PORT, function() {

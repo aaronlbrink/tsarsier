@@ -16,6 +16,9 @@ const PlayerComponent = ({socket, match, location, history}) => {
   // USER STATE
   const [name, setName] = useState(match.params.user);
 
+  // GAME STATE
+  const [actionsEnabled, setActionsEnabled] = useState(false);
+
   // USER INPUT STATE
   // const [actionsEnabled, setActionsEnabled] = useState(false);
   const [angle, setAngle] = useState(0);
@@ -45,7 +48,14 @@ const PlayerComponent = ({socket, match, location, history}) => {
         console.log('connection made!')
       });
     }
-  }, [name, socket])
+  }, [name, socket]);
+
+  useEffect(() => {
+    socket.on('action round status', () => {
+      console.log('YAY IT HAPPENED!')
+      // setActionsEnabled(startOrEnd);
+    })
+  })
   return (
     <>
 
@@ -55,7 +65,7 @@ const PlayerComponent = ({socket, match, location, history}) => {
         <input type="number" name="angle" min="0" max="360" onChange={(e) => setAngle(e.target.value)} value={angle} />
       </label>
       <label htmlFor="power">Power (0-{config.game.player.input.maxMagnitude})
-      <input type="number" name="power" min="0" max={config.game.player.input.maxMagnitude} onChange={(e) => setPower(e.target.value)} value={power} />
+      <input disabled={true} type="number" name="power" min="0" max={config.game.player.input.maxMagnitude} onChange={(e) => setPower(e.target.value)} value={power} />
       </label>
     </>
   )
