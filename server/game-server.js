@@ -167,7 +167,7 @@ module.exports = class GameServer {
         let player = config.game.player;
         let body = player.body;
         let realWidth = terrain.width * terrain.blockSize;
-        let spawnY = terrain.maxHeight * t + terrain.blockSize * 10;
+        let spawnY = terrain.maxHeight * terrain.blockSize + terrain.blockSize * 10;
         this.users.forEach(u => {
             let team = u.teamNumber;
             let spawnRandomInt = util.randomFloatBetween(player.spawnAwayFromEnd, realWidth - player.spawnAwayFromMid);
@@ -213,6 +213,16 @@ module.exports = class GameServer {
                 distance: util.randomFloatBetween(0, player.input.maxMovement),
             };
         });
+        
+        while(true) {
+            // Keep trying to move the player until the distance has been moved
 
+            // Rotate until get the rotation specified by player
+            
+            // Then once rotation is done take time to get the magnitude
+
+            // Once all player input has been done
+
+        }
     }
 }
