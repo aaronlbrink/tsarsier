@@ -33,9 +33,6 @@ app.post("/start", function(req, res) {
   Game.startRoundCountdown();
 });
 
-var users = [];
-var last_user_id = 0;
-
 io.on("connection", socket => {
   var addedUser = false;
 
@@ -44,15 +41,16 @@ io.on("connection", socket => {
     if (addedUser) return; // idempotent
     addedUser = true;
     console.log(
-      `adding user ${username} (users were ${JSON.stringify(users)})`
+      `adding user ${username} (users were ${JSON.stringify(Game.getUserList())})`
     );
     socket.username = username;
-    socket.user_id = ++last_user_id;
-    users.push({ username: socket.username, user_id: socket.user_id });
-    socket.emit("userlist", { users: users });
+    const newUserId = Game.addUser(socket.username);
+    console.log('returned ID:' + newUserId)
+    socket.userId = newUserId;
+    socket.emit("userlist", { users: Game.getUserList() });
     socket.broadcast.emit("user joined", {
       username: socket.username,
-      users: users
+      users: Game.getUserList()
     });
   });
 
@@ -74,12 +72,10 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
-    var idx = users.findIndex(d => d.user_id === socket.user_id);
-    if (idx >= 0) users.splice(idx, 1);
     console.log(
       `removed user ${socket.username} with id ${
-        socket.user_id
-      } (users are ${JSON.stringify(users)})`
+        socket.userId
+      } (users are ${JSON.stringify(Game.getUserList())})`
     );
   });
 

@@ -32,7 +32,8 @@ module.exports = class GameServer {
     constructor() {
         this.roundCountdown = config.game.roundDurationSeconds;
         this.engine = Engine.create();
-        this.world = engine.world;
+        this.users = [];
+        this.userIds = 0;
     }
 
     // GAME ROUND COUNTDOWN
@@ -89,6 +90,33 @@ module.exports = class GameServer {
 
     }
 
+    // User methods
+    addUser(username, ) {
+        this.users.push({
+            username: username,
+            userId: ++this.userIds,
+        });
+        return this.userIds;
+    }
+
+    removeUser(userId) {
+        var idx = this.users.findIndex(d => d.userId === userId);
+        if (idx >= 0) this.users.splice(idx, 1);
+    }
+
+    getUserList() {
+        return this.users;
+    }
+
+    setUserRotation(user, rotation) {
+        // TODO:
+        // user.find
+    }
+
+    setUserAngle(user, angle) {
+
+    }
+
     // ROUND CALCULATIONS & RUNNING
     runRound() {
         // Get calculations
@@ -108,7 +136,7 @@ module.exports = class GameServer {
             let generateDistance = util.randomIntBetween(generation.minCalculateDistance, generation.maxCalculateDistance);
             let heightChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
             for (let i = 0; i < generateDistance; i++) {
-                // Stop at end of terrain
+                // stop before getting to end of terrain
                 if (indexGenerating == terrain.max) break;
                 let heightChange = (i / generateDistance) * heightChange;
                 var height = util.between(generation.minHeight, generation.maxHeight, Math.floor(startHeight - heightChange));
@@ -124,7 +152,6 @@ module.exports = class GameServer {
                 let height = i * terrain.blockSize;
                 let width = heightIndex * terrain.blockSize;
                 let terrainBlockBody = Bodies.rectangle(width, height, width, height, {isStatic: true});
-                World.add(this.world, terrainBlockBody);
                 this.terrainBoxes[heightIndex].push(terrainBlockBody);
             }
             heightIndex++;
@@ -134,27 +161,7 @@ module.exports = class GameServer {
     generatePlayers() {
         this.randomlyAssignTeam();
         // Make all of the bodys for each player and spawn them randomly on their side of the game
-        let terrain = config.game.terrain;
-        let player = config.game.player;
-        let body = player.body;
-        let realWidth = terrain.width * terrain.blockSize;
-        let spawnY = terrain.maxHeight * t + terrain.blockSize * 10;
-        this.users.forEach(u => {
-            team = u.teamNumber;
-            spawnRandomInt = util.randomFloatBetween(player.spawnAwayFromEnd, realWidth - player.spawnAwayFromMid);
-            spawnX = (() => {
-                if (team == 1) {
-                    return spawnRandomInt;
-                }
-                if (team == 2) {
-                    return realWidth - spawnRandomInt;
-                }
-                throw "Cannot handle more than two teams"; 
-            })();
-            // spawn way above the ground. Simulation will have to happen to get them to touch the ground.
-            user.box = Bodies.rectangle(spawnX, spawnY, body.width, body.height, {inertia: "Infinity"});
-            World.add(this.world, user.box);
-        });
+        
     }
 
     randomlyAssignTeam() {
@@ -166,10 +173,9 @@ module.exports = class GameServer {
             var index = util.randomIntBetween(0, usersToAssign.length -1);
             let userAssigning = usersToAssign[index];
             // TODO make this actually assign it to the team number
-            // THIS MIGHT NOT BE WORKING I'M PRETENDING STUFF EXISTS
-            teamNumber = ((teamNumber + 1) % config.game.teams.numberOfTeams) + 1;
-            userAssigning.teamNumber = teamNumber;
+            
             array.splice(index, 1);
+            teamNumber = ((teamNumber + 1) % config.game.teams.numberOfTeams) + 1;
         }
     }
 
