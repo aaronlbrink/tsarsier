@@ -32,7 +32,7 @@ module.exports = class GameServer {
     constructor() {
         this.roundCountdown = config.game.roundDurationSeconds;
         this.engine = Engine.create();
-        this.world = engine.world;
+        this.world = this.engine.world;
     }
 
     // GAME ROUND COUNTDOWN
