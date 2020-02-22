@@ -1,17 +1,20 @@
-import React, { useReducer, useRef } from "react";
+import React, { useReducer, useRef, useState } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import Player from "./Player";
 import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
-import { BrowserRouter as Router, Switch, Route, Redirect, Link, withRouter } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect, Link, withRouter, } from "react-router-dom";
+import { createBrowserHistory } from "history";
 
+// Quick Routing
 const App = () => {
+  const customHistory = createBrowserHistory();
   return (
     <>
-      <Router>
+      <Router history={customHistory}>
         <Switch>
           <Route path="/player">
-            <Player />
+            <Player history={customHistory} />
           </Route>
           <Route exact path="/">
             <HomePage />
@@ -23,7 +26,10 @@ const App = () => {
   );
 };
 
+// The Screen / TV View
 const Home = (props) => {
+  const [name, setName] = useState();
+
   const reducer = (_, { data }) => data
   const Bunny = () => {
     const [motion, update] = useReducer(reducer)
@@ -53,21 +59,28 @@ const Home = (props) => {
 
   const goToClient = e => {
     e.preventDefault();
+    console.log(e);
+    props.history.push('/player');
+
+    // Send the user's name to the server
+    SocketIO.
     
   }
 
-  console.log(props.location)
+  const handleUpdateName = thing => {
+     setName(thing.target.value);
+  }
 
   return (
     <>
       <form onSubmit={goToClient}>
-        <input name="name" type="text" />
+        <input name="name" type="text" onChange={handleUpdateName} />
         <input type="submit" />
       </form>
-      <Link to="/players" />
+      <Link to="/player" />
 
-      <p>Location:</p>
-      <Stage width="300" height={300} options={{ backgroundColor: 0x1d2230 }}>
+      <p>Namen: {name}</p>
+      <Stage width={300} height={300} options={{ backgroundColor: 0x1d2230 }}>
         <Container x={150} y={150}>
           <Bunny />
         </Container>
