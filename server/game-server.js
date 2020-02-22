@@ -50,21 +50,15 @@ module.exports = class GameServer {
         
     }
 
-    start() {
+    resetStart() {
+        // Resets the game, but acts as the game starter...
+        
         // Has to run first
         this.destroyPreviousGame();
 
         this.resetValuesOnNewGame();
         this.generateTerrain();
         this.generatePlayers();
-    }
-
-    resetValuesOnNewGame() {
-        // meh
-    }
-
-    resetValuesOnNewGame() {
-        // meh
     }
     
     generateTerrain() {

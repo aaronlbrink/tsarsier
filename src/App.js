@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import io from "socket.io-client";
+import axios from 'axios';
 
 const socket = io.connect("http://localhost:3001", {
   reconnection: true,
@@ -89,6 +90,18 @@ const Home = props => {
     setName(thing.target.value);
   };
 
+  const startGame = () => {
+    axios.post('/reset', {
+      start: true,
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
   return (
     <>
       <form onSubmit={goToClient}>
@@ -103,6 +116,7 @@ const Home = props => {
       <p>Don't press enter to connect, click the go link</p>
 
       <p>Namen: {name}</p>
+      <p style={{cursor: 'pointer'}} onClick={startGame}>Start Game</p>
       <Stage width={300} height={300} options={{ backgroundColor: 0x1d2230 }}>
         <Container x={150} y={150}>
           <Bunny />
