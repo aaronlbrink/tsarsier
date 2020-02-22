@@ -84,14 +84,14 @@ module.exports = class GameServer {
 
         // Has to run first
         this.resetValuesOnNewGame();
-        // this.generateTerrain();
-        // this.generatePlayers();
+        this.generateTerrain();
+        this.generatePlayers();
 
     }
 
     // ROUND CALCULATIONS & RUNNING
     runRound() {
-        //meh
+        // Get calculations
     }
 
     
