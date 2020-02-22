@@ -1,11 +1,12 @@
 require('dotenv').config()
 var app = require('express')();
 var http = require('http').createServer(app);
+var cors = require('cors');
 // var io = require('socket.io')(http);
-// var GameServer = require('./server/game-server');
+var GameServer = require('./server/game-server');
 
-// const Game = new GameServer();
-
+const Game = new GameServer();
+app.use(cors())
 const io = require("socket.io")(http, {
   handlePreflightRequest: (req, res) => {
       const headers = {
@@ -24,7 +25,7 @@ app.get('/', function(req, res){
 });
 
 app.post('/reset', function(req, res) {
-  console.log(JSON.stringify(req.body));
+  Game.resetStart();
 })
 
 var users = [];

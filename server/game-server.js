@@ -1,4 +1,4 @@
-const util = require('./util');
+const util = require('./utils');
 const config = require('../src/config.json');
 const Matter = require('matter-js');
 
@@ -52,7 +52,7 @@ module.exports = class GameServer {
 
     resetStart() {
         // Resets the game, but acts as the game starter...
-        
+
         // Has to run first
         this.destroyPreviousGame();
 
