@@ -2,6 +2,10 @@ require('dotenv').config()
 var app = require('express')();
 var http = require('http').createServer(app);
 // var io = require('socket.io')(http);
+var GameServer = require('GameServer');
+
+const Game = new GameServer(0);
+Game.start();
 
 const io = require("socket.io")(http, {
   handlePreflightRequest: (req, res) => {
@@ -14,6 +18,7 @@ const io = require("socket.io")(http, {
       res.end();
   }
 });
+
 // io.set('origins', 'http://localhost:3001');
 app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
