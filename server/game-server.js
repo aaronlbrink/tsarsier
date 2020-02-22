@@ -32,9 +32,9 @@ module.exports = class GameServer {
     constructor() {
         this.roundCountdown = config.game.roundDurationSeconds;
         this.engine = Engine.create();
+        this.world = this.engine.world;
         this.users = [];
         this.userIds = 0;
-        this.world = this.engine.world;
     }
 
     // GAME ROUND COUNTDOWN
@@ -135,15 +135,15 @@ module.exports = class GameServer {
         while (indexGenerating < terrain.width) {
             let startHeight = this.heights[indexGenerating];
             let generateDistance = util.randomIntBetween(generation.minCalculateDistance, generation.maxCalculateDistance);
-            let heightChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
+            let heightDistanceChange = util.randomIntBetween(-generation.maxHeightChange, generation.maxHeightChange);
             for (let i = 0; i < generateDistance; i++) {
-                // stop before getting to end of terrain
-                if (indexGenerating == terrain.max) break;
-                let heightChange = (i / generateDistance) * heightChange;
+                // Stop at end of terrain
+                if (indexGenerating === terrain.max) break;
+                let heightChange = (i / generateDistance) * heightDistanceChange;
                 var height = util.between(generation.minHeight, generation.maxHeight, Math.floor(startHeight - heightChange));
                 this.heights.push(height);
             }
-            heights.push(terrain.minHeight);
+            this.heights.push(terrain.minHeight);
         }
         // Use the heights to generate the terrain as a bunch of boxes
         var heightIndex = 0;
@@ -160,12 +160,32 @@ module.exports = class GameServer {
     }
 
     generatePlayers() {
-        this.randomlyAssignTeam();
+        this.randomlyAssignTeams();
         // Make all of the bodys for each player and spawn them randomly on their side of the game
-        
+        let terrain = config.game.terrain;
+        let player = config.game.player;
+        let body = player.body;
+        let realWidth = terrain.width * terrain.blockSize;
+        let spawnY = terrain.maxHeight * t + terrain.blockSize * 10;
+        this.users.forEach(u => {
+            let team = u.teamNumber;
+            let spawnRandomInt = util.randomFloatBetween(player.spawnAwayFromEnd, realWidth - player.spawnAwayFromMid);
+            let spawnX = (() => {
+                if (team === 1) {
+                    return spawnRandomInt;
+                }
+                if (team === 2) {
+                    return realWidth - spawnRandomInt;
+                }
+                throw new Error("Cannot handle more than two teams"); 
+            })();
+            // spawn way above the ground. Simulation will have to happen to get them to touch the ground.
+            u.box = Bodies.rectangle(spawnX, spawnY, body.width, body.height, {inertia: "Infinity"});
+            World.add(this.world, u.box);
+        });
     }
 
-    randomlyAssignTeam() {
+    randomlyAssignTeams() {
         // Randomly pick a user from the list
         // assign to team 1 then to alternating
         let teamNumber = 1;
@@ -174,14 +194,24 @@ module.exports = class GameServer {
             var index = util.randomIntBetween(0, usersToAssign.length -1);
             let userAssigning = usersToAssign[index];
             // TODO make this actually assign it to the team number
-            
-            array.splice(index, 1);
+            // THIS MIGHT NOT BE WORKING I'M PRETENDING STUFF EXISTS
             teamNumber = ((teamNumber + 1) % config.game.teams.numberOfTeams) + 1;
+            userAssigning.teamNumber = teamNumber;
+            userAssigning.splice(index, 1);
         }
     }
 
     roundAnimate() {
-        // 
+        // pretend like I have a bunch of input
+        // calculate the game from the fake input
+        let player = config.game.player;
+        this.users.forEach(u => {
+            u.input = {
+                rotation: util.randomFloatBetween(0, 360), 
+                magnitude: util.randomFloatBetween(0, player.input.maxMagnitude),
+                distance: util.randomFloatBetween(0, player.input.maxMovement),
+            };
+        });
 
     }
 }
