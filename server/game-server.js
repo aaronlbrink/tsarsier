@@ -109,9 +109,10 @@ module.exports = class GameServer {
         return this.users;
     }
 
-    setUserRotation(user, rotation) {
+    setUserRotation(username, rotation) {
         // TODO:
-        // user.find
+        const userToUpdate = this.users.find(user => user.username === username)
+        console.log(userToUpdate);
     }
 
     setUserAngle(user, angle) {

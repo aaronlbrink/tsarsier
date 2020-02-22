@@ -2,6 +2,7 @@ import React, { useState, useEffect, } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import { Link, withRouter } from 'react-router-dom';
+const config = require('./config');
 // import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
 // import {
 //   BrowserRouter as Router,
@@ -50,11 +51,11 @@ const PlayerComponent = ({socket, match, location, history}) => {
 
       <Link to="/">Toggle Web</Link>
       <p>You are: {name}!</p>
-      <label htmlFor="angle">Angle
-        <input type="text" name="angle" onChange={(e) => setAngle(e.target.value)} value={angle} />
+      <label htmlFor="angle">Angle (0-360)
+        <input type="number" name="angle" min="0" max="360" onChange={(e) => setAngle(e.target.value)} value={angle} />
       </label>
-      <label htmlFor="power">Power
-      <input type="text" name="power" onChange={(e) => setPower(e.target.value)} value={power} />
+      <label htmlFor="power">Power (0-{config.game.player.input.maxMagnitude})
+      <input type="number" name="power" min="0" max={config.game.player.input.maxMagnitude} onChange={(e) => setPower(e.target.value)} value={power} />
       </label>
     </>
   )
