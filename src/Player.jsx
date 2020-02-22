@@ -22,6 +22,7 @@ const PlayerComponent = ({socket, match, location, history}) => {
 
   useEffect(() => {
     // Send power adjustment (on each input update)
+    console.log('effect ran!');
     socket.emit('power move', power, name);
   }, [power, name, socket])
 
