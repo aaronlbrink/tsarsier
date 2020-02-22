@@ -7,7 +7,12 @@ import { BrowserRouter as Router, Switch, Route, Redirect, Link, withRouter, } f
 import { createBrowserHistory } from "history";
 import io from 'socket.io-client';
 
-const socket = io.connect('http://localhost:3001');
+const socket = io.connect( 'http://localhost:3001', {
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax : 5000,
+    reconnectionAttempts: 99999
+} );
 
 // Quick Routing
 const App = () => {
@@ -62,9 +67,11 @@ const Home = (props) => {
 
   const goToClient = e => {
     e.preventDefault();
-    console.log(e);
     // Send the user's name to the server
     socket.emit('add user', name);
+    socket.on('connect', () => {
+      console.log('connection made!')
+    })
 
     props.history.push('/player');
   }
