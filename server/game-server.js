@@ -29,12 +29,15 @@ Data sent from phone:
 
 
 module.exports = class GameServer {
-    constructor() {
+    constructor(io) {
         this.roundCountdown = config.game.roundDurationSeconds;
         this.engine = Engine.create();
         this.world = this.engine.world;
         this.users = [];
         this.userIds = 0;
+        this.isActionRound = false;
+        this.io = io;
+        
     }
 
     // GAME ROUND COUNTDOWN
@@ -45,23 +48,31 @@ module.exports = class GameServer {
     }
 
     startRoundCountdown = () => {
-            setTimeout(() => {
-                console.log('ran' + this.roundCountdown)
-                if (this.roundCountdown > 0) {
-                    this.roundCountdown--;
-                    this.startRoundCountdown();
-                    return;
-                }
-                // Reset countdown
-                this.roundCountdown = config.game.roundDurationSeconds;
-                // Ask for playback to start
-                this.runRound();
-            }, 1000);
+        this.isActionRound = true;
+        this.io.on("connection", socket => {
+            console.log('figure out backend')
+            socket.emit('action round status');
+        });
+        this.roundCountdowns();
     }
 
-    getTick() {
-        return this.roundCountdown;
+    roundCountdowns = () => {
+        setTimeout(() => {
+            console.log('ran' + this.roundCountdown)
+            if (this.roundCountdown > 0) {
+                this.roundCountdown--;
+                this.roundCountdowns();
+                return;
+            }
+            // Reset countdown, stop accepting input
+            this.roundCountdown = config.game.roundDurationSeconds;
+            this.isActionRound = false;
+            // Ask for playback to start
+            this.runRound();
+        }, 1000);
+
     }
+
 
     checkEndGame() {
         // Check if all players left are on the same team
@@ -71,7 +82,8 @@ module.exports = class GameServer {
     
     resetValuesOnNewGame() {
         // Reset every game variable for the new game
-        this.timer = 0;
+        this.roundCountDown = 0;
+        this.isActionRound = false;
         this.roundCount = 0;
         this.terrainBoxes = [];
         this.roundCountdownToZero();
@@ -110,12 +122,17 @@ module.exports = class GameServer {
     }
 
     setUserRotation(username, rotation) {
-        // TODO:
-        const userToUpdate = this.users.find(user => user.username === username)
-        console.log(userToUpdate);
+        if (this.isActionRound) {
+            let userToUpdate = this.users.find(user => user.username === username);
+            if (userToUpdate) {
+                userToUpdate.input = {};
+                userToUpdate.input.rotation = rotation;
+            }
+            console.log('Rotation input was accepted for' + username + " at an angle of " + rotation);
+        }
     }
 
-    setUserAngle(user, angle) {
+    setUserMagnitude(user, magnitude) {
 
     }
 
