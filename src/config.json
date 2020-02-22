@@ -22,11 +22,12 @@
             }
         },
         "terrain": {
-            "blockSize": 20,
+            "blockSize": 2,
             "width": 400,
             "maxHeight": 200,
-            "minHeight": 130,
+            "minHeight": 100,
             "generation": {
+                "startHeight": 150,
                 "minCalculateDistance": 5,
                 "maxCalculateDistance": 15,
                 "maxHeightChange": 10
