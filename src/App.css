@@ -43,3 +43,7 @@ html, body {
     transform: rotate(360deg);
   }
 }
+
+.button:active {
+  background-color: blue !important;
+}
