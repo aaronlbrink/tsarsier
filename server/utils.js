@@ -14,6 +14,11 @@ exports.randomIntBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+exports.randomFloatBetween = (min, max) => {
+    max++;
+    return Math.random() * (max - min) + min;
+}
+
 exports.between = (min, max, value) => {
     value = Math.min(max, Math.max(min, value));
 }

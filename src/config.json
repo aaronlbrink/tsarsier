@@ -11,6 +11,8 @@
             "team2Color": "red"
         },
         "player": {
+            "spawnAwayFromEnd": 10,
+            "spawnAwayFromMid": 10,
             "nameMaxCharCount": 15,
             "body": {
                 "width": 10,
