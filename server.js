@@ -56,18 +56,19 @@ io.on("connection", socket => {
     });
   });
 
-  socket.on("angle move", move => {
+  socket.on("angle move", (move, username) => {
     console.log(
       `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
-        move
+        username
       )}`
     );
+    Game.setUserAngle(username, move);
   });
 
-  socket.on("power move", move => {
+  socket.on("power move", (move, username) => {
     console.log(
       `user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(
-        move
+        username
       )}`
     );
   });
