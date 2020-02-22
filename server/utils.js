@@ -13,3 +13,7 @@ exports.randomIntBetween = (min, max) => {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min);
 }
+
+exports.between = (min, max, value) => {
+    value = Math.min(max, Math.max(min, value));
+}
