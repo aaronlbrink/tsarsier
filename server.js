@@ -1,7 +1,20 @@
+require('dotenv').config()
 var app = require('express')();
 var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+// var io = require('socket.io')(http);
 
+const io = require("socket.io")(http, {
+  handlePreflightRequest: (req, res) => {
+      const headers = {
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+          "Access-Control-Allow-Credentials": true
+      };
+      res.writeHead(200, headers);
+      res.end();
+  }
+});
+// io.set('origins', 'http://localhost:3001');
 app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
@@ -27,12 +40,12 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('angle move', (move, name) => {
-    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(name)}`);
+  socket.on('angle move', (move) => {
+    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(move)}`);
   })
 
-  socket.on('power move', (move, name) => {
-    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(name)}`);
+  socket.on('power move', (move) => {
+    console.log(`user chose to move ${JSON.stringify(move)}, by user: ${JSON.stringify(move)}`);
   })
 
   socket.on('disconnect', () => {
@@ -49,5 +62,5 @@ io.on('connection', (socket) => {
 });
 
 http.listen(process.env.SERVER_PORT, function(){
-  console.log('listening on *:3001');
+  console.log(`listening on ${process.env.SERVER_PORT}`);
 });

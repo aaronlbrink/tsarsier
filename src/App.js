@@ -18,7 +18,7 @@ const socket = io.connect("http://localhost:3001", {
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
-  reconnectionAttempts: 99999
+  reconnectionAttempts: 99999,
 });
 
 // Quick Routing
@@ -100,6 +100,7 @@ const Home = props => {
         />
         <Link to={`/player/${name}`}>Go!</Link>
       </form>
+      <p>Don't press enter to connect, click the go link</p>
 
       <p>Namen: {name}</p>
       <Stage width={300} height={300} options={{ backgroundColor: 0x1d2230 }}>
