@@ -3,7 +3,7 @@ import React, { useReducer, useRef } from "react";
 import "./App.css";
 import Player from "./Player";
 import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect, Link, withRouter } from "react-router-dom";
 
 const App = () => {
   return (
@@ -13,16 +13,17 @@ const App = () => {
           <Route path="/player">
             <Player />
           </Route>
-          <Route path="/">
-            <Home />
+          <Route exact path="/">
+            <HomePage />
           </Route>
+          <Redirect to="/" />
         </Switch>
       </Router>
     </>
   );
 };
 
-const Home = () => {
+const Home = (props) => {
   const reducer = (_, { data }) => data
   const Bunny = () => {
     const [motion, update] = useReducer(reducer)
@@ -52,7 +53,10 @@ const Home = () => {
 
   const goToClient = e => {
     e.preventDefault();
+    
   }
+
+  console.log(props.location)
 
   return (
     <>
@@ -60,6 +64,9 @@ const Home = () => {
         <input name="name" type="text" />
         <input type="submit" />
       </form>
+      <Link to="/courses?sort=name" />
+
+      <p>Location:</p>
       <Stage width="300" height={300} options={{ backgroundColor: 0x1d2230 }}>
         <Container x={150} y={150}>
           <Bunny />
@@ -68,4 +75,7 @@ const Home = () => {
     </>
   );
 };
+
+const HomePage = withRouter(Home);
+
 export default App;
