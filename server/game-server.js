@@ -129,13 +129,21 @@ module.exports = class GameServer {
         }
     }
 
-    setUserMagnitude(user, magnitude) {
-
+    setUserMagnitude(username, magnitude) {
+        if (this.isActionRound) {
+            let userToUpdate = this.users.find(user => user.username === username);
+            if (userToUpdate) {
+                userToUpdate.input = {};
+                userToUpdate.input.magnitude = magnitude;
+            }
+            console.log('Magnitude input was accepted for' + username + " at a magnitude of " + magnitude);
+        }
     }
 
     // ROUND CALCULATIONS & RUNNING
     runRound() {
         this.io.emit('action round status', { actionRoundOn: false});
+
         // Get calculations
     }
 
