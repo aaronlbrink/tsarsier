@@ -372,7 +372,7 @@ module.exports = class GameServer {
             // Once all player input has been done
 
         }
-        finishRoundAnimate();
+        this.finishRoundAnimate();
     }
 
     finishRoundAnimate = () => {

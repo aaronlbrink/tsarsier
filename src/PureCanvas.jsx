@@ -8,8 +8,8 @@ export default class PureCanvas extends React.Component {
   render() {
     return (
       <canvas
-        width="300"
-        height="300"
+        width="900"
+        height="900"
         ref={node =>
           node ? this.props.contextRef(node.getContext('2d')) : null
         }
