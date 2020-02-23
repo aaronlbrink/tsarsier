@@ -14,19 +14,29 @@ export default class Canvas extends React.Component {
   }
 
   componentDidUpdate() {
-    const { angle } = this.props;
     this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.ctx.translate(this.width / 2, this.height / 2);
-    this.ctx.rotate((angle * Math.PI) / 180);
+    this.ctx.font = '48px serif';
+    this.ctx.fillText('Hello world', 10, 50);
+    const columns = Array(40);
+    let i = 0;
+    columns.map(function(col, a) {
+      this.ctx.fillRect(i++, 0, 1, this.height - 20)
+      return this.ctx.fillRect(i, 0, 1, this.height - 20)
+    });
+    this.ctx.fillRect(0, 0, 1, this.height)
+    this.ctx.fillRect(1, 0, 1, this.height - 80)
+    this.ctx.fillRect(3, 0, 1, this.height - 80)
+    this.ctx.clearRect(0, 0, 40, 40);
+    
+    // this.ctx.translate(this.width / 2, this.height / 2);
+    // this.ctx.rotate((angle * Math.PI) / 180);
     this.ctx.fillStyle = '#4397AC';
-    this.ctx.fillRect(
-      -this.width / 4,
-      -this.height / 4,
-      this.width / 2,
-      this.height / 2
-    );
+    // this.ctx.fillRect(
+    //   -this.width / 4,
+    //   -this.height / 4,
+    //   this.width / 2,
+    //   this.height / 2
+    // );
     this.ctx.restore();
   }
 
