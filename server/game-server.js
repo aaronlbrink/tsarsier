@@ -113,6 +113,23 @@ module.exports = class GameServer {
                 roundStartPosX: null
             },
         });
+        // users = [{
+        //     name: 'PETER',
+        //     x: -170, y: -90,
+        //     projectile: {
+        //       x: -140, y:-120,
+        //     },
+        //   },{
+        //     name: 'KRIS',
+        //     x: 0, y:0,
+        //     projectile: {
+        //       x: -10, y:-80,
+        //     },
+        //   },{
+        //     name: 'ARCHIE',
+        //     x:30, y: 35,
+        //   }];
+        this.io.emit()
         return this.userIds;
     }
 
@@ -156,7 +173,7 @@ module.exports = class GameServer {
     // ROUND CALCULATIONS & RUNNING
     runRound() {
         this.io.emit('action round status', { actionRoundOn: false});
-        console.log('users!-----1')
+        console.log('------users!-----')
         console.log(this.users)
         this.io.emit('action round results', { users: this.users });
         // Get calculations

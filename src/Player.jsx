@@ -2,17 +2,18 @@ import React, { useState, useEffect, } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 import { Link, withRouter } from 'react-router-dom';
+import io from "socket.io-client";
 const config = require('./config');
-// import { Container, Stage, Sprite, useTick } from "@inlet/react-pixi";
-// import {
-//   BrowserRouter as Router,
-//   Switch,
-//   Route,
-//   Link
-// } from "react-router-dom";
 
-const PlayerComponent = ({socket, match, location, history}) => {
-
+const PlayerComponent = ({match, location, history}) => {
+  // Socket connection shared by both TV/viewer and Phone/Controller
+  const socket = io.connect("http://localhost:3001", {
+    forceNew: true,
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: 99999,
+  });
   // USER STATE
   const [name, setName] = useState(match.params.user);
 
@@ -25,12 +26,13 @@ const PlayerComponent = ({socket, match, location, history}) => {
   const [power, setPower] = useState(0);
 
   useEffect(() => {
+
     // Send power adjustment (on each input update)
-    console.log('effect ran!');
     socket.emit('power move', power, name);
   }, [power, name, socket])
 
   useEffect(() => {
+
     // Send angle adjustment (on each input update)
     socket.emit('angle move', angle, name);
   }, [angle, name, socket])
@@ -41,12 +43,13 @@ const PlayerComponent = ({socket, match, location, history}) => {
   }, [match.params.user]);
 
   useEffect(() => {
-    if (!socket.connected) {
-      // Try connecting
+    // Add user
+    if (name) {
       socket.emit('add user', name);
-      socket.on('connect', () => {
-        console.log('connection made!')
-      });
+    }
+    return function cleanUp() {
+      console.log('running cleanup, disconnect user from game')
+      socket.emit('disconnect user', name)
     }
   }, [name, socket]);
 
@@ -56,10 +59,9 @@ const PlayerComponent = ({socket, match, location, history}) => {
       console.log(data.actionRoundOn)
       setActionsDisabled(!data.actionRoundOn);
     })
-  })
+  }, [socket])
   return (
     <>
-
       <Link to="/">Toggle Web</Link>
       {actionsDisabled ? <div style={{width: 20, height: 20, backgroundColor: 'red'}} /> : <div style={{width: 20, height: 20, backgroundColor: 'green', borderRadius: '100'}} /> }
       <p>You are: {name}!</p>

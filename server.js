@@ -25,19 +25,21 @@ io.on("connection", socket => {
   // Connecting users
   socket.on("add user", username => {
     if (addedUser) return; // idempotent
-    addedUser = true;
-    console.log(
-      `adding user ${username} (users were ${JSON.stringify(Game.getUserList())})`
-    );
+    console.log(`adding user ${username} (users were ${JSON.stringify(Game.getUserList())})`);
+    // check for uniqueness
+    if (Game.getUserList().filter(user => user.username === username).length !== 0) return;
     socket.username = username;
     const newUserId = Game.addUser(socket.username);
-    console.log('returned ID:' + newUserId)
     socket.userId = newUserId;
-    socket.emit("userlist", { users: Game.getUserList() });
-    socket.broadcast.emit("user joined", {
-      username: socket.username,
-      users: Game.getUserList()
-    });
+    console.log('returned ID:' + newUserId)
+    
+
+    // socket.emit("userlist", { users: Game.getUserList() });
+    // socket.broadcast.emit("user joined", {
+    //   username: socket.username,
+    //   users: Game.getUserList()
+    // });
+    addedUser = true;
   });
 
   socket.on("angle move", (move, username) => {
@@ -53,9 +55,10 @@ io.on("connection", socket => {
     Game.setUserMagnitude(username, move);
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect user", username => {
+    Game.removeUser(socket.userId);
     console.log(
-      `removed user ${socket.username} with id ${
+      `removed user ${username} with id ${
         socket.userId
       } (users are ${JSON.stringify(Game.getUserList())})`
     );

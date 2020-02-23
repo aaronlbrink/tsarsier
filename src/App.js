@@ -9,7 +9,6 @@ import {
   Switch,
   Route,
   Redirect,
-  Link,
   withRouter
 } from "react-router-dom";
 import { createBrowserHistory } from "history";
@@ -17,6 +16,7 @@ import io from "socket.io-client";
 import axios from 'axios';
 const config = require('./config');
 
+// Socket connection shared by both TV/viewer and Phone/Controller
 const socket = io.connect("http://localhost:3001", {
   reconnection: true,
   reconnectionDelay: 1000,
@@ -32,7 +32,7 @@ const App = () => {
       <Router history={customHistory}>
         <Switch>
           <Route path="/player/:user">
-            <Player socket={socket} />
+            <Player />
           </Route>
           <Route exact path="/">
             <HomePage />
@@ -49,14 +49,21 @@ const App = () => {
 // The Screen / TV View
 const Home = props => {
   const [name, setName] = useState();
-  const [tickNumber, setTickNumber] = useState();
   const [actionRoundResults, setActionRoundResults] = useState();
 
   const canvas_width = 600;
   const server_width = config.game.terrain.width;
 
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Socket connection made!");
+    });
+  })
+
   useEffect(() => {
     socket.on('action round results', (data) => {
+      
       console.log('Action round data' + data);
       console.log(data)
       setActionRoundResults(data.users);
@@ -168,24 +175,10 @@ const Home = props => {
     return [...terrain_views, ...username_views, ...user_views, ...projectile_views];
   };
 
-  useEffect(() => {
-    // Update round count
-    socket.on("tick tock", (update) => {
-      console.log('tick tock' + update);
-      setTickNumber(update)
-    })
-  }, )
-
-  const goToClient = e => {
+  const goToController = e => {
     if (name) {
       e.preventDefault();
-      // Send the user's name to the server
-      socket.emit("add user", name);
-      socket.on("connect", () => {
-        console.log("connection made!");
-      });
-
-      props.history.push("/player");
+      props.history.push(`/player/${name}`);
     }
   };
 
@@ -220,14 +213,14 @@ const Home = props => {
 
   return (
     <>
-      <form onSubmit={goToClient}>
+      <form onSubmit={goToController}>
         <input
           name="name"
           type="text"
           onChange={handleUpdateName}
           value={name}
         />
-        <Link to={`/player/${name}`}>Go!</Link>
+        <input type="submit" value="Go!" /> 
       </form>
       <p>Don't press enter to connect, click the go link</p>
 
@@ -235,9 +228,9 @@ const Home = props => {
 
       <button style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</button>
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
-      <p>TIMER: {tickNumber}</p>
-      <Stage width={canvas_width} height={canvas_width} options={{ backgroundColor: 0xede2e0 }}>
-        <Container x={0} y={0}>
+
+      <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
+        <Container x={200} y={200}>
           <Visuals />
         </Container>
       </Stage>
