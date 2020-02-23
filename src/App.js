@@ -15,6 +15,7 @@ import {
 import { createBrowserHistory } from "history";
 import io from "socket.io-client";
 import axios from 'axios';
+const config = require('./config');
 
 const socket = io.connect("http://localhost:3001", {
   reconnection: true,
@@ -43,11 +44,16 @@ const App = () => {
   );
 };
 
+
+
 // The Screen / TV View
 const Home = props => {
   const [name, setName] = useState();
   const [tickNumber, setTickNumber] = useState();
   const [actionRoundResults, setActionRoundResults] = useState();
+
+  const canvas_width = 600;
+  const server_width = config.game.terrain.width;
 
   useEffect(() => {
     socket.on('action round results', (data) => {
@@ -83,13 +89,17 @@ const Home = props => {
           ({x:x, y:y})));
 
     function transform_coordinate(server_x, server_y) {
-      // The server thinks (0,0) is the bottom-left and (400,400) is the top-right.
-      // PIXI.js thinks (0,0) is the top-left and (400,400) is the bottom-right.
+      // The server thinks (0,0) is the bottom-left.
+      // PIXI.js thinks (0,0) is the top-left.
       // Later we'll dynamically change the width of the <canvas> requiring more code here.
-      return [server_x, 400-server_y];
+
+      return [
+        server_x / server_width * canvas_width,
+        canvas_width - server_y / server_width * canvas_width
+      ];
     }
 
-    const blockSize = 2; // todo: fetch from config.game.terrain.blockSize;
+    const canvas_blocksize = config.game.terrain.blockSize / server_width * canvas_width;
     const terrain_views = terrain_ground_cells.map(cell => {
       const [x, y] = transform_coordinate(cell.x, cell.y);
       return (
@@ -98,9 +108,9 @@ const Home = props => {
           g.clear()
           g.beginFill(0x9b7653)
           g.moveTo(x, y)
-          g.lineTo(x + blockSize, y)
-          g.lineTo(x + blockSize, y + blockSize)
-          g.lineTo(x, y + blockSize)
+          g.lineTo(x + canvas_blocksize, y)
+          g.lineTo(x + canvas_blocksize, y + canvas_blocksize)
+          g.lineTo(x, y + canvas_blocksize)
           g.endFill()
         }}
       />
@@ -226,7 +236,7 @@ const Home = props => {
       <button style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</button>
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
       <p>TIMER: {tickNumber}</p>
-      <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
+      <Stage width={canvas_width} height={canvas_width} options={{ backgroundColor: 0xede2e0 }}>
         <Container x={0} y={0}>
           <Visuals />
         </Container>
