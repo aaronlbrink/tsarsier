@@ -10,6 +10,7 @@ import {
   Redirect,
   withRouter
 } from "react-router-dom";
+import Canvas from './Canvas';
 import { createBrowserHistory } from "history";
 import io from "socket.io-client";
 import axios from 'axios';
@@ -43,6 +44,31 @@ const App = () => {
   );
 };
 
+
+class Animation extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { angle: 0 };
+    this.updateAnimationState = this.updateAnimationState.bind(this);
+  }
+  
+  componentDidMount() {
+    this.rAF = requestAnimationFrame(this.updateAnimationState);
+  }
+  
+  componentWillUnmount() {
+    cancelAnimationFrame(this.rAF);
+  }
+  
+  updateAnimationState() {
+    this.setState(prevState => ({ angle: prevState.angle + 1 }));
+    this.rAF = requestAnimationFrame(this.updateAnimationState);
+  }
+  
+  render() {
+    return <Canvas angle={this.state.angle} />
+  }
+}
 
 
 
@@ -105,6 +131,7 @@ const Home = props => {
     });
   }
 
+
   return (
     <>
       <form onSubmit={goToController}>
@@ -123,6 +150,7 @@ const Home = props => {
       <button onClick={resetGame}>Reset Game</button>
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
       <br />
+      <Animation></Animation>
     </>
   );
 };
