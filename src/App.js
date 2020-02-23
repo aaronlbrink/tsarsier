@@ -229,8 +229,8 @@ const Home = props => {
       <button style={{cursor: 'pointer'}} onClick={resetGame}>Reset Game</button>
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
 
-      <Stage width={400} height={400} options={{ backgroundColor: 0xede2e0 }}>
-        <Container x={200} y={200}>
+      <Stage width={canvas_width} height={canvas_width} options={{ backgroundColor: 0xede2e0 }}>
+        <Container x={0} y={0}>
           <Visuals />
         </Container>
       </Stage>
