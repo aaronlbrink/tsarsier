@@ -2,6 +2,7 @@ require("dotenv").config();
 var app = require("express")();
 var http = require("http").createServer(app);
 var cors = require("cors");
+var NodeTree = require('./server/NodeTree');
 // var io = require('socket.io')(http);
 var GameServer = require("./server/game-server");
 
@@ -19,6 +20,8 @@ const io = require("socket.io")(http, {
 });
 
 const Game = new GameServer(io);
+const tree = new NodeTree(300, 300).generateTree();
+console.log(tree)
 
 io.on("connection", socket => {
   var addedUser = false;
