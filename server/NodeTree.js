@@ -3,7 +3,7 @@ module.exports = class NodeTree {
   constructor(width, height) {
     this.NTWIDTH = width;
     this.NTHEIGHT = height;
-    this.polygons = [ { uniqueName: 'polyA', points: [ [-10, -10], [-10, 300], [400, 200], [400, -10] ] } ];
+    this.polygons = [ { uniqueName: 'polyA', points: [ [-10, -10], [-10, 10], [400, 10], [400, -10] ] } ];
   }
   
   // newPolygon: { uniqueName: 'a nice poly', points: [ [0, 2], [1, 4] ] }
