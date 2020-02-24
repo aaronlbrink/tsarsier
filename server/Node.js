@@ -1,5 +1,6 @@
+const LOWEST_RESOLUTION = 1;
 module.exports = class Node {
-  constructor(polygonsToCareAbout = [], bottomLeftCoord, sideLength) {
+  constructor(polygonsToCareAbout = [], bottomLeftCoord, sideLength, NT) {
     // Polys to care about point to polys, but aren't the polys themselves
     this.polygonsToCareAbout = polygonsToCareAbout;
 
@@ -21,16 +22,17 @@ module.exports = class Node {
     if (this.polygonsToCareAbout.length === 0) {
       // Empty Leaf
       console.log('Empty leaf');
+      NT.push({coordXY: this.bottomLeftCoord, length: sideLength, isEmpty: true})
       return;
     }
     if (this.checkIfNodeIsFilledByPoly()) {
       console.log('FILLED!');
+      NT.push({coordXY: this.bottomLeftCoord, length: sideLength})
       return;
     }
 
     // SUBDIVIDING (recurrsion)
-    if (sideLength > 5) {
-
+    if (sideLength > LOWEST_RESOLUTION) {
 
       // Define the start points (bottom left most point) for each sub quad.
       // All start points can be obtained by dividing the length in half.
@@ -60,17 +62,18 @@ module.exports = class Node {
 
       // Generate new nodes
       // Bottom left subnode
-      new Node(this.q1Polygons, quadStartCoords.bottomLeft, sideLength / 2);
+      this.subNodeBottomLeft = new Node(this.q1Polygons, quadStartCoords.bottomLeft, sideLength / 2, NT);
       // Top left subnode
-      new Node(this.q2Polygons, quadStartCoords.topLeft, sideLength / 2);
+      this.subNodeTopLeft = new Node(this.q2Polygons, quadStartCoords.topLeft, sideLength / 2, NT);
       // Top right subnode
-      new Node(this.q3Polygons, quadStartCoords.topRight, sideLength / 2);
+      this.subNodeTopRight = new Node(this.q3Polygons, quadStartCoords.topRight, sideLength / 2, NT);
       // Bottom right subnode
-      new Node(this.q4Polygons, quadStartCoords.bottomRight, sideLength / 2);
+      this.subNodeBottomRight = new Node(this.q4Polygons, quadStartCoords.bottomRight, sideLength / 2, NT);
     }
   }
 
   testQuad = (quadCoords, polygonIndex, quadPolygons) => {
+    const DEBUG_METHOD = false;
     // Test 1: One of the corners of the quad is inside the polygon
     for (let qTestIndex = 0; qTestIndex < 4; qTestIndex++) {
       let qName = "";
@@ -80,7 +83,7 @@ module.exports = class Node {
       if (qTestIndex === 3) { qName = "bottomRight";}
 
       if (this.isPointInPolygon(quadCoords[qName], this.polygonsToCareAbout[polygonIndex].points)) {
-        console.log('TEST 1: QUAD VERTEX IS INSIDE POLYGON')
+        if (DEBUG_METHOD) { console.log('TEST 1: QUAD VERTEX IS INSIDE POLYGON')}
         quadPolygons.push(this.polygonsToCareAbout[polygonIndex])
         break;
       }
@@ -92,7 +95,7 @@ module.exports = class Node {
         // Since in Test 1 we established "no corner of the quad is in this polygon", and here in
         // Test 2 we have established "a point of the polygon is in the quad", it must be true that
         // the quad contains the polygon, and therefore the quad should care about this polygon.
-        console.log('TEST 2: POLYGON POINT IS INSIDE QUAD')
+        if (DEBUG_METHOD) { console.log('TEST 2: POLYGON POINT IS INSIDE QUAD')}
         quadPolygons.push(this.polygon[polygonIndex]);
         break;
       }
@@ -112,30 +115,29 @@ module.exports = class Node {
   }
 
   checkIfNodeIsFilledByPoly = () => {
+    const DEBUG_METHOD = false;
     // Iterate through each polygon the node was told to care about
     for (let polygonIndex = 0; polygonIndex < this.polygonsToCareAbout.length; polygonIndex++) {
 
       // Check root point, aka bottom left (cartissian)
       const resultBottomLeft = this.isPointInPolygon(this.bottomLeftCoord, this.polygonsToCareAbout[polygonIndex].points);
-      console.log('L BOTTOM LEFT is inside given polygon L : ' + resultBottomLeft);
+      if (DEBUG_METHOD) { console.log('L BOTTOM LEFT is inside given polygon L : ' + resultBottomLeft); }
 
       // Check top left
       const resultTopLeft = this.isPointInPolygon(this.topLeftCoord, this.polygonsToCareAbout[polygonIndex].points);
-      console.log('|⎺ TOP LEFT is inside given polygon |⎺ : ' + resultTopLeft)
+      if (DEBUG_METHOD) { console.log('|⎺ TOP LEFT is inside given polygon |⎺ : ' + resultTopLeft)}
 
       // Check top right
       const resultTopRight = this.isPointInPolygon(this.topRightCoord, this.polygonsToCareAbout[polygonIndex].points);
-      console.log('⎺| TOP RIGHT is inside given polygon ⎺| : ' + resultTopRight)
+      if (DEBUG_METHOD) { console.log('⎺| TOP RIGHT is inside given polygon ⎺| : ' + resultTopRight)}
 
       // Check bottom right
       const resultBottomRight = this.isPointInPolygon(this.bottomRightCoord, this.polygonsToCareAbout[polygonIndex].points);
-      console.log('_| BOTTOM RIGHT is inside given polygon _| : ' + resultBottomRight)
+      if (DEBUG_METHOD) { console.log('_| BOTTOM RIGHT is inside given polygon _| : ' + resultBottomRight)}
 
-      if (resultBottomLeft && resultTopLeft && resultTopRight && resultBottomRight) {
-        // All 4 points defining the node are contained within the boundaries of a single polygon
-        // Node should be filled!
-        console.log('Filled leaf');
-      }
+      // All 4 points defining the node are contained within the boundaries of a single polygon
+      // Node should be filled
+      return resultBottomLeft && resultTopLeft && resultTopRight && resultBottomRight;
     }
   }
 
@@ -144,7 +146,7 @@ module.exports = class Node {
   isPointInPolygon(point, polygon = []) {
     const DEBUG_METHOD = false;
     let intersections = 0;
-    console.log('start check if point is in polygon');
+    if (DEBUG_METHOD) { console.log('start check if point is in polygon');}
     // Iterate over number of lines in polygon (number of points divided by two, plus the connecting line at between the end node and the first node)
     for (let pointIndex = 0; pointIndex < polygon.length; pointIndex++ ) {
       if (DEBUG_METHOD) { console.log('--LINE #' + (pointIndex + 1) + '--') }

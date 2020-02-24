@@ -45,30 +45,30 @@ const App = () => {
 };
 
 
-class Animation extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { angle: 0 };
-    this.updateAnimationState = this.updateAnimationState.bind(this);
-  }
+// class Animation extends React.Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { angle: 0 };
+//     this.updateAnimationState = this.updateAnimationState.bind(this);
+//   }
   
-  componentDidMount() {
-    this.rAF = requestAnimationFrame(this.updateAnimationState);
-  }
+//   componentDidMount() {
+//     this.rAF = requestAnimationFrame(this.updateAnimationState);
+//   }
   
-  componentWillUnmount() {
-    cancelAnimationFrame(this.rAF);
-  }
+//   componentWillUnmount() {
+//     cancelAnimationFrame(this.rAF);
+//   }
   
-  updateAnimationState() {
-    this.setState(prevState => ({ angle: prevState.angle + 1 }));
-    this.rAF = requestAnimationFrame(this.updateAnimationState);
-  }
+//   updateAnimationState() {
+//     this.setState(prevState => ({ angle: prevState.angle + 1 }));
+//     this.rAF = requestAnimationFrame(this.updateAnimationState);
+//   }
   
-  render() {
-    return <Canvas angle={0} />
-  }
-}
+//   render() {
+//     return <Canvas angle={0} terrainData={this.props.terrainData} />
+//   }
+// }
 
 
 
@@ -76,6 +76,7 @@ class Animation extends React.Component {
 const Home = props => {
   const [name, setName] = useState();
   const [actionRoundResults, setActionRoundResults] = useState();
+  const [terrainData, setTerrainData] = useState();
 
   const canvas_width = 600;
   const server_width = config.game.terrain.width;
@@ -91,9 +92,16 @@ const Home = props => {
     socket.on('action round results', (data) => {
       
       console.log('Action round data' + data);
-      console.log(data)
+      // console.log(data)
       setActionRoundResults(data.users);
     })
+  })
+
+  useEffect(() => {
+    socket.on('initial game structure', (data) => {
+      // console.log(data);
+      setTerrainData(data.tree);
+    });
   })
 
   const goToController = e => {
@@ -150,7 +158,7 @@ const Home = props => {
       <button onClick={resetGame}>Reset Game</button>
       <button onClick={startFirstRound}>Start First Round (everyone is in the game)</button>
       <br />
-      <Animation></Animation>
+      <Canvas terrainData={terrainData} />
     </>
   );
 };
