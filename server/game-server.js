@@ -1,7 +1,7 @@
 const util = require('./utils');
 const config = require('../src/config.json');
 const Matter = require('matter-js');
-
+var NodeTree = require('./NodeTree');
 var Engine = Matter.Engine,
     World = Matter.World,
     Bodies = Matter.Bodies;
@@ -37,6 +37,7 @@ module.exports = class GameServer {
         this.userIds = 0;
         this.isActionRound = false;
         this.io = io;
+        this.mapTree = new NodeTree(900, 900)
         
     }
 
@@ -93,7 +94,9 @@ module.exports = class GameServer {
 
     resetStart() {
         // Resets the game, but acts as the game starter...
-
+        this.mapTree.generateTree();
+        // Let's have it draw for now too...
+        this.io.emit('initial game structure', { tree: this.mapTree.getTree()});
         // Has to run first
         this.resetValuesOnNewGame();
         this.generateTerrain();
