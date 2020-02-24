@@ -20,8 +20,7 @@ const io = require("socket.io")(http, {
 });
 
 const Game = new GameServer(io);
-const tree = new NodeTree(300, 300).generateTree();
-console.log(tree)
+new NodeTree(300, 300).generateTree();
 
 io.on("connection", socket => {
   var addedUser = false;
