@@ -13,7 +13,8 @@ module.exports = class NodeTree {
 
   generateTree = () => {
     const node = new Node();
-    node.checkIfPointIsInPolygon([1, 1], this.polygons[0].points);
+    const isPointIn = node.isPointInPolygon([5, 5], this.polygons[0].points);
+    console.log('is the point in the polygon? ' + isPointIn)
   }
   
 }
